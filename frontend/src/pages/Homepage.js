@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Tab, Tabs, Typography, alpha, styled } from "@mui/material";
+import {
+  Box,
+  Container,
+  Tab,
+  Tabs,
+  Typography,
+  alpha,
+  styled,
+} from "@mui/material";
 import axios from "axios";
 import SignUp from "../components/Auth/SignUp";
 import SignIn from "../components/Auth/SignIn";
 
-const StyledTabs = styled((props) => <Tabs {...props}/>)({
-  '& .MuiTabs-indicator': {
-    backgroundColor: 'transparent',
+const StyledTabs = styled((props) => <Tabs {...props} />)({
+  "& .MuiTabs-indicator": {
+    backgroundColor: "transparent",
   },
 });
 
-const StyledTab = styled((props) => <Tab {...props} />)(
-  ({ theme }) => ({
-    width: "40%",
-    minHeight: 32,
-    textTransform: 'none',
-    fontFamily: 'Poppins',
-    fontWeight: 500,
-    fontSize: 16,
-    margin: '0 8px',
-    borderRadius: 5,
-    '&.Mui-selected': {
-      backgroundColor: alpha(theme.palette.primary.main, 0.1),
-      color: theme.palette.primary.dark,
-    },
-  }),
-);
+const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
+  width: "40%",
+  minHeight: 32,
+  textTransform: "none",
+  fontFamily: "Poppins",
+  fontWeight: 500,
+  fontSize: 16,
+  margin: "0 8px",
+  borderRadius: 5,
+  "&.Mui-selected": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+    color: theme.palette.primary.dark,
+  },
+}));
 
 const Homepage = () => {
   const [value, setValue] = useState(0);
@@ -39,9 +45,9 @@ const Homepage = () => {
     console.log("data :>> ", data);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   return (
     <Container
