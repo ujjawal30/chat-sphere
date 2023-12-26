@@ -1,17 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import axios from "axios";
+import { Container } from "@mui/material";
+import { UserContext } from "../context/UserProvider";
+import Navbar from "../components/Navbar";
 
 const ChatPage = () => {
-  const fetchData = async () => {
-    const { data } = await axios.get("/api/chats");
-    console.log("data :>> ", data);
-  };
+  const { user } = useContext(UserContext);
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    console.log("user :>> ", user);
+  }, [user]);
 
-  return <div>ChatPage</div>;
+  return (
+    <Container maxWidth="xl" sx={{ p: { xs: 2 } }}>
+      <Navbar />
+    </Container>
+  );
 };
 
 export default ChatPage;
