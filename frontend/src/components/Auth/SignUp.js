@@ -1,20 +1,17 @@
-import React, { forwardRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Alert,
   Button,
   FormControl,
   IconButton,
   InputAdornment,
   InputLabel,
   OutlinedInput,
-  Snackbar,
   Stack,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AxiosClient from "../../api/AxiosClient";
-
-const defaultAlertConfig = { open: false, type: "success", message: "" };
+import { ToastContext } from "../../context/ToastProvider";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -22,9 +19,9 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [alert, setAlert] = useState(defaultAlertConfig);
 
   const navigate = useNavigate();
+  const { toastify } = useContext(ToastContext);
 
   const fetchData = async () => {
     const registerUserResponse = await AxiosClient.post("/api/user/register", {
@@ -37,16 +34,16 @@ const SignUp = () => {
 
     console.log("registerUserResponse :>> ", registerUserResponse);
     if (registerUserResponse) {
-      setAlert({
+      toastify({
         open: true,
         type: "success",
         message: "User registered successfully",
       });
 
       localStorage.setItem("user", JSON.stringify(registerUserResponse));
-      // navigate("/chats");
+      navigate("/chats");
     } else {
-      setAlert({
+      toastify({
         open: true,
         type: "error",
         message: "Something wnet wrong!!!",
@@ -54,19 +51,11 @@ const SignUp = () => {
     }
   };
 
-  const handleAlertClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlert((prev) => ({ ...prev, open: false }));
-  };
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleSignUp = () => {
     if (!name || !email || !password || !confirmPassword) {
-      setAlert({
+      toastify({
         open: true,
         type: "error",
         message: "Please fill all the fields.",
@@ -75,7 +64,7 @@ const SignUp = () => {
     }
 
     if (password !== confirmPassword) {
-      setAlert({
+      toastify({
         open: true,
         type: "error",
         message: "Passwords do not match.",
@@ -157,21 +146,6 @@ const SignUp = () => {
       <Button variant="contained" onClick={handleSignUp}>
         Sign Up
       </Button>
-
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={alert.open}
-        autoHideDuration={6000}
-        onClose={handleAlertClose}
-      >
-        <Alert
-          onClose={handleAlertClose}
-          severity={alert.type}
-          variant="filled"
-        >
-          {alert.message}
-        </Alert>
-      </Snackbar>
     </Stack>
   );
 };

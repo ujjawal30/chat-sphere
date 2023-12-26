@@ -1,28 +1,25 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Alert,
   Button,
   FormControl,
   IconButton,
   InputAdornment,
   InputLabel,
   OutlinedInput,
-  Snackbar,
   Stack,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AxiosClient from "../../api/AxiosClient";
-
-const defaultAlertConfig = { open: false, type: "success", message: "" };
+import { ToastContext } from "../../context/ToastProvider";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [alert, setAlert] = useState(defaultAlertConfig);
 
   const navigate = useNavigate();
+  const { toastify } = useContext(ToastContext);
 
   const authnticateUser = async () => {
     const userResponse = await AxiosClient.post("/api/user/auth", {
@@ -34,16 +31,17 @@ const SignIn = () => {
 
     console.log("userResponse :>> ", userResponse);
     if (userResponse) {
-      setAlert({
+      toastify({
         open: true,
         type: "success",
         message: "User logged-in successfully",
       });
+      // toastify("Logged in");
 
       localStorage.setItem("user", JSON.stringify(userResponse));
-      // navigate("/chats");
+      navigate("/chats");
     } else {
-      setAlert({
+      toastify({
         open: true,
         type: "error",
         message: "Something wnet wrong!!!",
@@ -51,19 +49,11 @@ const SignIn = () => {
     }
   };
 
-  const handleAlertClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlert((prev) => ({ ...prev, open: false }));
-  };
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleSignIn = () => {
     if (!email || !password) {
-      setAlert({
+      toastify({
         open: true,
         type: "error",
         message: "Please fill all the fields.",
@@ -112,21 +102,6 @@ const SignIn = () => {
       <Button variant="contained" onClick={handleSignIn}>
         Sign In
       </Button>
-
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={alert.open}
-        autoHideDuration={6000}
-        onClose={handleAlertClose}
-      >
-        <Alert
-          onClose={handleAlertClose}
-          severity={alert.type}
-          variant="filled"
-        >
-          {alert.message}
-        </Alert>
-      </Snackbar>
     </Stack>
   );
 };
