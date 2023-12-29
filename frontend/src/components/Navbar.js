@@ -1,144 +1,43 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
-  styled,
-  alpha,
   AppBar,
   Box,
   Toolbar,
   IconButton,
   Typography,
-  InputBase,
   Badge,
   Menu,
   MenuItem,
-  TextField,
-  InputAdornment,
+  Avatar,
 } from "@mui/material";
-import {
-  Search,
-  AccountCircle,
-  Mail,
-  Notifications,
-  MoreVert,
-  Clear,
-  ArrowBack,
-} from "@mui/icons-material";
+import { Search, Notifications, Group } from "@mui/icons-material";
+import SearchBar from "./SearchBar";
+import ProfileMenu from "./ProfileMenu";
 
 const Navbar = () => {
   const [searchBarShow, setSearchBarShow] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   const toggleSearchBarShow = () => {
     setSearchBarShow(!searchBarShow);
   };
 
-  const clearSearchBar = () => {
-    setSearchValue("");
-  };
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
+  const handleMenuOpen = (event) => {
+    console.log("event :>> ", event.currentTarget);
+    setMenuAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
+    setMenuAnchorEl(null);
   };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const menuId = "primary-search-account-menu";
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = "primary-search-account-menu-mobile";
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <Mail />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <Notifications />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box>
       <AppBar
         position="static"
         sx={{
           borderRadius: 5,
-          height: "5rem",
+          height: "56px",
           justifyContent: "center",
           boxShadow: "none",
         }}
@@ -151,82 +50,41 @@ const Navbar = () => {
             sx={{
               display: { xs: searchBarShow ? "none" : "block", sm: "block" },
             }}
+            fontFamily={"Poppins"}
+            fontWeight={400}
           >
             ChatSphere
           </Typography>
 
+          <SearchBar active={searchBarShow} onClose={toggleSearchBarShow} />
+
           <Box
             sx={{
-              display: { xs: searchBarShow ? "block" : "none", sm: "block" },
-              width: { xs: "100%", sm: "40%" },
+              display: { xs: searchBarShow ? "none" : "flex", sm: "flex" },
             }}
           >
-            <TextField
-              id="search"
-              placeholder="Start a new chat..."
-              InputProps={{
-                style: { color: "white" },
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ color: "white" }}>
-                    {searchBarShow ? (
-                      <IconButton
-                        onClick={toggleSearchBarShow}
-                        edge="start"
-                        sx={{ color: "white" }}
-                      >
-                        <ArrowBack />
-                      </IconButton>
-                    ) : (
-                      <Search />
-                    )}
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{ display: searchValue ? "flex" : "none" }}
-                  >
-                    <IconButton
-                      onClick={clearSearchBar}
-                      edge="end"
-                      sx={{ color: "white" }}
-                    >
-                      <Clear />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={(theme) => ({
-                borderRadius: 20,
-                color: "#fff",
-                backgroundColor: alpha(theme.palette.common.white, 0.15),
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.common.white, 0.25),
-                },
-                "& fieldset": { border: "none" },
-                margin: "auto",
-                width: "100%",
-              })}
-              size="small"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-          </Box>
-
-          <Box sx={{ display: { xs: "none", sm: "flex" } }}>
             <IconButton
               size="large"
-              aria-label="show 4 new mails"
+              aria-label="search"
               color="inherit"
+              sx={{ display: { xs: "block", sm: "none" } }}
+              onClick={toggleSearchBarShow}
             >
-              <Badge badgeContent={4} color="error">
-                <Mail />
-              </Badge>
+              <Search />
             </IconButton>
             <IconButton
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
+              <Group />
+            </IconButton>
+            <IconButton
+              size="large"
+              aria-label="show 17 new notifications"
+              color="inherit"
+              sx={{ display: { xs: "none", sm: "block" } }}
             >
               <Badge badgeContent={17} color="error">
                 <Notifications />
@@ -236,45 +94,18 @@ const Navbar = () => {
               size="large"
               edge="end"
               aria-label="account of current user"
-              aria-controls={menuId}
+              aria-controls="account-menu"
               aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
+              onClick={handleMenuOpen}
               color="inherit"
             >
-              <AccountCircle />
-            </IconButton>
-          </Box>
-
-          <Box
-            sx={{
-              display: { xs: searchBarShow ? "none" : "block", sm: "none" },
-            }}
-          >
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={toggleSearchBarShow}
-              color="inherit"
-            >
-              <Search />
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreVert />
+              <Avatar sx={{ width: 32, height: 32 }} />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
+
+      <ProfileMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
     </Box>
   );
 };
