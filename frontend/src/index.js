@@ -5,17 +5,20 @@ import "./index.css";
 import App from "./App";
 import UserProvider from "./context/UserProvider";
 import ToastProvider from "./context/ToastProvider";
+import ChatProvider from "./context/ChatProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <UserProvider>
+    <BrowserRouter>
       <ToastProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <UserProvider>
+          <ChatProvider>
+            <App />
+          </ChatProvider>
+        </UserProvider>
       </ToastProvider>
-    </UserProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
