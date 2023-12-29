@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   AppBar,
   Box,
@@ -13,10 +13,13 @@ import {
 import { Search, Notifications, Group } from "@mui/icons-material";
 import SearchBar from "./SearchBar";
 import ProfileMenu from "./ProfileMenu";
+import { UserContext } from "../context/UserProvider";
 
 const Navbar = () => {
   const [searchBarShow, setSearchBarShow] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  const { user } = useContext(UserContext);
 
   const toggleSearchBarShow = () => {
     setSearchBarShow(!searchBarShow);
@@ -99,7 +102,7 @@ const Navbar = () => {
               onClick={handleMenuOpen}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32 }} />
+              <Avatar src={user?.user?.pic} sx={{ width: 32, height: 32 }} />
             </IconButton>
           </Box>
         </Toolbar>

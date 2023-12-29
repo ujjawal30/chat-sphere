@@ -54,7 +54,7 @@ const ChatCard = ({ data }) => {
         alignItems="center"
         gap={1}
       >
-        <Avatar src={data?.picture} sx={{ width: 48, height: 48 }} />
+        <Avatar src={data?.pic} sx={{ width: 48, height: 48 }} />
         <Stack flexGrow={1} width={"50%"}>
           <Typography
             variant="subtitle2"

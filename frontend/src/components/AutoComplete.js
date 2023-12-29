@@ -7,11 +7,17 @@ import {
   Typography,
   alpha,
 } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
+import { ChatContext } from "../context/ChatProvider";
 
-const AutoComplete = ({ resultSet, loading }) => {
-  const handleSearchItemClick = () => {
+const AutoComplete = ({ resultSet, loading, onClose }) => {
+  const { setChat } = useContext(ChatContext);
+
+  const handleSearchItemClick = (user) => {
     console.log("<<: Search Item Clicked :>>");
+    console.log(user);
+    setChat(user);
+    onClose();
   };
 
   return (
@@ -57,7 +63,7 @@ const AutoComplete = ({ resultSet, loading }) => {
                   lineHeight: 1.2,
                 },
               })}
-              onClick={handleSearchItemClick}
+              onClick={() => handleSearchItemClick(user)}
             >
               <Avatar src={user?.pic} sx={{ width: 40, height: 40 }} />
               <Stack flexGrow={1}>

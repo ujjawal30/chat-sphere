@@ -17,6 +17,15 @@ const SearchBar = ({ active, onClose }) => {
 
   const searchRef = useRef(null);
 
+  const fetchUsers = async (value) => {
+    const usersResponse = await AxiosClient.get(`/api/user?search=${value}`)
+      .then((res) => res.data)
+      .catch((err) => console.log("err :>> ", err));
+
+    setSearchResult(usersResponse);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     active && searchRef.current?.children[0]?.children?.search?.focus();
   }, [active]);
@@ -24,13 +33,21 @@ const SearchBar = ({ active, onClose }) => {
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchValue(value);
+
+    setIsLoading(true);
+    fetchUsers(value);
   };
 
   const handleSearchClear = () => setSearchValue("");
 
   const handleSearchClose = () => {
-    onClose();
+    active && onClose();
     handleSearchClear();
+  };
+
+  const handleSuggestionClick = () => {
+    handleSearchClose();
+    setSearchResult();
   };
 
   return (
@@ -97,7 +114,11 @@ const SearchBar = ({ active, onClose }) => {
         onChange={handleSearch}
       />
       {searchValue && (
-        <AutoComplete resultSet={searchResult} loading={isLoading} />
+        <AutoComplete
+          resultSet={searchResult}
+          loading={isLoading}
+          onClose={handleSuggestionClick}
+        />
       )}
     </Box>
   );
