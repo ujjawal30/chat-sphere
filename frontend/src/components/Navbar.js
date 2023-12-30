@@ -102,7 +102,7 @@ const Navbar = () => {
               onClick={handleMenuOpen}
               color="inherit"
             >
-              <Avatar src={user?.user?.pic} sx={{ width: 32, height: 32 }} />
+              <Avatar src={user?.pic} sx={{ width: 32, height: 32 }} />
             </IconButton>
           </Box>
         </Toolbar>

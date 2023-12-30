@@ -10,9 +10,9 @@ const UserProvider = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("user"));
-    setUser(userInfo);
-    console.log("location :>> ", location);
+    const { user } = JSON.parse(localStorage.getItem("user"));
+    setUser(user);
+    console.log("user :>> ", user);
 
     // if (!userInfo) {
     //   navigate("/");

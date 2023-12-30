@@ -10,9 +10,11 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import { ChatContext } from "../context/ChatProvider";
+import { UserContext } from "../context/UserProvider";
 
 const ChatCard = ({ data }) => {
   const { chat, setChat } = useContext(ChatContext);
+  const { user } = useContext(UserContext);
 
   const handleChatClick = () => {
     data?._id === chat?._id ? setChat(null) : setChat(data);
@@ -63,7 +65,9 @@ const ChatCard = ({ data }) => {
             whiteSpace={"nowrap"}
             fontWeight={600}
           >
-            {data?.name}
+            {data?.isGroupChat
+              ? data?.chatName
+              : data?.users?.find((u) => u._id !== user?._id)?.name}
           </Typography>
           <Typography
             variant="caption"
@@ -71,11 +75,13 @@ const ChatCard = ({ data }) => {
             textOverflow={"ellipsis"}
             whiteSpace={"nowrap"}
           >
-            {data?.about}
+            {data?.isGroupChat
+              ? "chat created"
+              : data?.users?.find((u) => u._id !== user?._id)?.email}
           </Typography>
         </Stack>
         <Stack alignSelf={"start"} pt={1}>
-          <Typography variant="caption">{data?.lastTime}</Typography>
+          <Typography variant="caption">{data?.updatedAt}</Typography>
         </Stack>
       </Box>
     </Paper>

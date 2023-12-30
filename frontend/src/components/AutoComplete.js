@@ -9,14 +9,19 @@ import {
 } from "@mui/material";
 import React, { useContext } from "react";
 import { ChatContext } from "../context/ChatProvider";
+import AxiosClient from "../api/AxiosClient";
 
 const AutoComplete = ({ resultSet, loading, onClose }) => {
-  const { setChat } = useContext(ChatContext);
+  const { allChats, setChat, setAllChats } = useContext(ChatContext);
 
-  const handleSearchItemClick = (user) => {
-    console.log("<<: Search Item Clicked :>>");
-    console.log(user);
-    setChat(user);
+  const handleSearchItemClick = async (user) => {
+    const chatResponse = await AxiosClient.get(`/api/chats/${user._id}`)
+      .then((res) => res.data)
+      .catch((err) => console.log("err :>> ", err));
+
+    setChat(chatResponse);
+    !allChats.find((c) => c._id === chatResponse._id) &&
+      setAllChats([chatResponse, ...allChats]);
     onClose();
   };
 

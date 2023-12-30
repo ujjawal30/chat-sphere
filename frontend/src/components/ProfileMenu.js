@@ -37,11 +37,11 @@ const ProfileMenu = ({ anchorEl, handleClose }) => {
     >
       <MenuItem sx={{ lineHeight: 0 }}>
         <ListItemIcon>
-          <Avatar src={user?.user.pic} sx={{ width: 48, height: 48 }} />
+          <Avatar src={user?.pic} sx={{ width: 48, height: 48 }} />
         </ListItemIcon>
         <Box px={1}>
-          <Typography>{user?.user.name}</Typography>
-          <Typography variant="caption">{user?.user.email}</Typography>
+          <Typography>{user?.name}</Typography>
+          <Typography variant="caption">{user?.email}</Typography>
         </Box>
       </MenuItem>
       <Divider />

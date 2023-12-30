@@ -6,9 +6,10 @@ import {
   TextField,
   alpha,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import AutoComplete from "./AutoComplete";
 import AxiosClient from "../api/AxiosClient";
+import { ChatContext } from "../context/ChatProvider";
 
 const SearchBar = ({ active, onClose }) => {
   const [searchValue, setSearchValue] = useState("");

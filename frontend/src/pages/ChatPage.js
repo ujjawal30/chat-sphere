@@ -4,6 +4,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Container,
   Divider,
   Grid,
@@ -19,6 +20,7 @@ import Navbar from "../components/Navbar";
 import { ChatContext } from "../context/ChatProvider";
 import ChatCard from "../components/ChatCard";
 import { ArrowBack, Info, Send } from "@mui/icons-material";
+import AxiosClient from "../api/AxiosClient";
 
 const ChatData = [
   {
@@ -186,11 +188,22 @@ const MSG = [
 const ChatPage = () => {
   const [messages, setMesaages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { user } = useContext(UserContext);
   const { chat, setChat, allChats, setAllChats } = useContext(ChatContext);
 
   const messagesEndRef = useRef(null);
+
+  const fetchAllChats = async () => {
+    const chatsResponse = await AxiosClient.get(`/api/chats`)
+      .then((res) => res.data)
+      .catch((err) => console.log("err :>> ", err));
+
+    console.log("chatsResponse :>> ", chatsResponse);
+    setAllChats(chatsResponse);
+    setIsLoading(false);
+  };
 
   const handleSendMessage = () => {
     setMesaages([...messages, { content: newMsg, sent: true }]);
@@ -202,14 +215,19 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
+    fetchAllChats();
     setMesaages(MSG);
-    setAllChats(ChatData);
   }, []);
 
   useEffect(() => {
     scrollToBottom();
     console.log("new message send", messages);
   }, [messages]);
+
+  useEffect(() => {
+    console.log("selected", chat);
+  }, [chat]);
 
   return (
     <Container maxWidth="xl" sx={{ p: { xs: 2 }, height: "100vh" }}>
@@ -231,14 +249,25 @@ const ChatPage = () => {
                 height="100%"
                 sx={{ overflowY: "auto" }}
               >
-                {allChats?.map((data, index) => (
-                  <Box key={data._id}>
-                    <ChatCard data={data} />
-                    {index + 1 !== allChats.length && (
-                      <Divider variant="middle" />
-                    )}
+                {isLoading ? (
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    height={"100%"}
+                  >
+                    <CircularProgress />
                   </Box>
-                ))}
+                ) : (
+                  allChats?.map((data, index) => (
+                    <Box key={data._id}>
+                      <ChatCard data={data} />
+                      {index + 1 !== allChats.length && (
+                        <Divider variant="middle" />
+                      )}
+                    </Box>
+                  ))
+                )}
               </Box>
             </Box>
           </Grid>
@@ -273,10 +302,10 @@ const ChatPage = () => {
                 >
                   <ArrowBack />
                 </IconButton>
-                <Avatar src={chat?.picture} sx={{ width: 48, height: 48 }} />
+                <Avatar src={chat?.pic} sx={{ width: 48, height: 48 }} />
                 <Stack flexGrow={1}>
                   <Typography variant="caption">
-                    {chat?.name || "Test"}
+                    {chat?.chatName || "Test"}
                   </Typography>
                 </Stack>
                 <Info color="disabled" />
