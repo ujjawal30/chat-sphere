@@ -15,7 +15,7 @@ import SearchBar from "./SearchBar";
 import ProfileMenu from "./ProfileMenu";
 import { UserContext } from "../context/UserProvider";
 
-const Navbar = () => {
+const Navbar = ({ onGroupModalOpen, onProfileModalOpen }) => {
   const [searchBarShow, setSearchBarShow] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -80,6 +80,7 @@ const Navbar = () => {
               aria-label="show 17 new notifications"
               color="inherit"
               sx={{ display: { xs: "none", sm: "block" } }}
+              onClick={onGroupModalOpen}
             >
               <Group />
             </IconButton>
@@ -89,9 +90,7 @@ const Navbar = () => {
               color="inherit"
               sx={{ display: { xs: "none", sm: "block" } }}
             >
-              <Badge badgeContent={17} color="error">
-                <Notifications />
-              </Badge>
+              <Notifications />
             </IconButton>
             <IconButton
               size="large"
@@ -108,7 +107,11 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
 
-      <ProfileMenu anchorEl={menuAnchorEl} handleClose={handleMenuClose} />
+      <ProfileMenu
+        anchorEl={menuAnchorEl}
+        handleClose={handleMenuClose}
+        {...{ onGroupModalOpen, onProfileModalOpen }}
+      />
     </Box>
   );
 };

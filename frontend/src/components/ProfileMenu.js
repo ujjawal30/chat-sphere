@@ -19,7 +19,12 @@ import {
 import React, { useContext } from "react";
 import { UserContext } from "../context/UserProvider";
 
-const ProfileMenu = ({ anchorEl, handleClose }) => {
+const ProfileMenu = ({
+  anchorEl,
+  handleClose,
+  onGroupModalOpen,
+  onProfileModalOpen,
+}) => {
   const { user } = useContext(UserContext);
 
   const isMenuOpen = Boolean(anchorEl);
@@ -45,7 +50,7 @@ const ProfileMenu = ({ anchorEl, handleClose }) => {
         </Box>
       </MenuItem>
       <Divider />
-      <MenuItem onClick={handleClose}>
+      <MenuItem onClick={onProfileModalOpen}>
         <ListItemIcon>
           <Person fontSize="small" />
         </ListItemIcon>
@@ -57,7 +62,7 @@ const ProfileMenu = ({ anchorEl, handleClose }) => {
         </ListItemIcon>
         Notifications
       </MenuItem>
-      <MenuItem onClick={handleClose}>
+      <MenuItem onClick={onGroupModalOpen}>
         <ListItemIcon>
           <GroupAdd fontSize="small" />
         </ListItemIcon>

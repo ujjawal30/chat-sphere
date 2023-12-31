@@ -21,6 +21,9 @@ import { ChatContext } from "../context/ChatProvider";
 import ChatCard from "../components/ChatCard";
 import { ArrowBack, Info, Send } from "@mui/icons-material";
 import AxiosClient from "../api/AxiosClient";
+import GroupModal from "../components/modals/GroupModal";
+import ProfileModal from "../components/modals/ProfileModal";
+import { getSender } from "../helpers/ChatHelpers";
 
 const ChatData = [
   {
@@ -185,10 +188,27 @@ const MSG = [
   },
 ];
 
+const defaultGroupModalOptions = {
+  open: false,
+  data: {},
+  createMode: true,
+};
+
+const defaultProfileModalOptions = {
+  open: false,
+  data: {},
+};
+
 const ChatPage = () => {
   const [messages, setMesaages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [groupModalOptions, setGroupModalOptions] = useState(
+    defaultGroupModalOptions
+  );
+  const [profileModalOptions, setProfileModalOptions] = useState(
+    defaultProfileModalOptions
+  );
 
   const { user } = useContext(UserContext);
   const { chat, setChat, allChats, setAllChats } = useContext(ChatContext);
@@ -214,6 +234,25 @@ const ChatPage = () => {
     messagesEndRef.current?.scrollIntoView(true);
   };
 
+  const openGroupModal = (createMode = true) =>
+    setGroupModalOptions({
+      open: true,
+      data: createMode ? {} : chat,
+      createMode,
+    });
+
+  const closeGroupModal = () =>
+    setGroupModalOptions({ ...groupModalOptions, open: false });
+
+  const openProfileModal = (self = true) =>
+    setProfileModalOptions({
+      open: true,
+      data: self ? user : getSender(chat?.users, user),
+    });
+
+  const closeProfileModal = () =>
+    setProfileModalOptions({ ...profileModalOptions, open: false });
+
   useEffect(() => {
     setIsLoading(true);
     fetchAllChats();
@@ -232,7 +271,10 @@ const ChatPage = () => {
   return (
     <Container maxWidth="xl" sx={{ p: { xs: 2 }, height: "100vh" }}>
       <Box display={"flex"} flexDirection={"column"} gap={2} height={"100%"}>
-        <Navbar />
+        <Navbar
+          onGroupModalOpen={openGroupModal}
+          onProfileModalOpen={openProfileModal}
+        />
         <Grid container spacing={2} flexGrow={1} overflow={"hidden"}>
           <Grid
             item
@@ -308,7 +350,15 @@ const ChatPage = () => {
                     {chat?.chatName || "Test"}
                   </Typography>
                 </Stack>
-                <Info color="disabled" />
+                <IconButton
+                  onClick={
+                    chat?.isGroupChat
+                      ? () => openGroupModal(false)
+                      : () => openProfileModal(false)
+                  }
+                >
+                  <Info />
+                </IconButton>
               </Box>
               <Box
                 flexGrow={1}
@@ -372,6 +422,17 @@ const ChatPage = () => {
           </Grid>
         </Grid>
       </Box>
+      <GroupModal
+        groupData={groupModalOptions.data}
+        open={groupModalOptions.open}
+        createMode={groupModalOptions.createMode}
+        onClose={closeGroupModal}
+      />
+      <ProfileModal
+        userData={profileModalOptions.data}
+        open={profileModalOptions.open}
+        onClose={closeProfileModal}
+      />
     </Container>
   );
 };
