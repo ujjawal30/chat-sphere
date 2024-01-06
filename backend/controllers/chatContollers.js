@@ -72,10 +72,11 @@ const getChats = asyncHandler(async (req, res) => {
   }
 });
 
-const createGroup = asyncHandler(async (req, res) => {
-  const { name, users } = req.body;
+const createOrUpdateGroup = asyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+  const { chatName, users } = req.body;
 
-  if (!name || !users) {
+  if (!chatName || !users) {
     res.status(400);
     throw new Error("Please fill all the fields.");
   }
@@ -86,104 +87,29 @@ const createGroup = asyncHandler(async (req, res) => {
   }
 
   try {
-    const newGroupChat = await Chat.create({
-      chatName: name,
-      users: [req.user._id, ...users],
-      isGroupChat: true,
-      groupAdmin: req.user._id,
-    });
+    if (chatId) {
+      const groupChat = await Chat.findByIdAndUpdate(
+        chatId,
+        { chatName, users },
+        { new: true }
+      )
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
 
-    const groupChat = await Chat.findOne({ _id: newGroupChat._id })
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
-
-    res.status(200).json(groupChat);
-  } catch (error) {
-    res.status(500);
-    throw new Error(error?.message);
-  }
-});
-
-const renameGroup = asyncHandler(async (req, res) => {
-  const { chatId, chatName } = req.body;
-
-  if (!chatId || !chatName) {
-    res.status(400);
-    throw new Error("Please provide valid payload.");
-  }
-
-  try {
-    const renameGroup = await Chat.findByIdAndUpdate(
-      chatId,
-      { chatName },
-      { new: true }
-    )
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
-
-    if (renameGroup) {
-      res.status(200).json(renameGroup);
+      res.status(200).json(groupChat);
     } else {
-      res.status(404);
-      throw new Error("Chat not available.");
-    }
-  } catch (error) {
-    res.status(500);
-    throw new Error(error?.message);
-  }
-});
+      const newGroupChat = await Chat.create({
+        chatName,
+        users: [req.user._id, ...users],
+        isGroupChat: true,
+        groupAdmin: req.user._id,
+      });
 
-const addToGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
+      const groupChat = await Chat.findOne({ _id: newGroupChat._id })
+        .populate("users", "-password")
+        .populate("groupAdmin", "-password");
 
-  if (!chatId || !userId) {
-    res.status(400);
-    throw new Error("Please provide valid payload.");
-  }
-
-  try {
-    const addUser = await Chat.findByIdAndUpdate(
-      chatId,
-      { $push: { users: userId } },
-      { new: true }
-    )
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
-
-    if (addUser) {
-      res.status(200).json(addUser);
-    } else {
-      res.status(404);
-      throw new Error("Chat not available.");
-    }
-  } catch (error) {
-    res.status(500);
-    throw new Error(error?.message);
-  }
-});
-
-const removeFromGroup = asyncHandler(async (req, res) => {
-  const { chatId, userId } = req.body;
-
-  if (!chatId || !userId) {
-    res.status(400);
-    throw new Error("Please provide valid payload.");
-  }
-
-  try {
-    const removeUser = await Chat.findByIdAndUpdate(
-      chatId,
-      { $pull: { users: userId } },
-      { new: true }
-    )
-      .populate("users", "-password")
-      .populate("groupAdmin", "-password");
-
-    if (removeUser) {
-      res.status(200).json(removeUser);
-    } else {
-      res.status(404);
-      throw new Error("Chat not available.");
+      res.status(200).json(groupChat);
     }
   } catch (error) {
     res.status(500);
@@ -194,8 +120,5 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 module.exports = {
   getAllChats,
   getChats,
-  createGroup,
-  renameGroup,
-  addToGroup,
-  removeFromGroup,
+  createOrUpdateGroup,
 };
