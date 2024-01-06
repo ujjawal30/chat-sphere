@@ -17,8 +17,10 @@ import {
   alpha,
   styled,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AxiosClient from "../../api/AxiosClient";
+import { ToastContext } from "../../context/ToastProvider";
+import { ChatContext } from "../../context/ChatProvider";
 
 const buttonStyle = {
   boxShadow: 0,
@@ -56,10 +58,16 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const GroupModal = ({ groupData, open, createMode, onClose }) => {
+const GroupModal = ({
+  groupData,
+  open,
+  createMode,
+  onClose,
+  fetchAgain,
+  setFetchAgain,
+}) => {
   const [editMode, setEditMode] = useState(false);
-  const [groupName, setGroupName] = useState("");
-  const [groupMembers, setGroupMembers] = useState([]);
+  const [group, setGroup] = useState({ chatName: "", users: [] });
   const [groupMemberIds, setGroupMemberIds] = useState([]);
   const [groupPic, setGroupPic] = useState("");
 
@@ -67,10 +75,80 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
   const [searchUsersResult, setSearchUsersResult] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { toastify } = useContext(ToastContext);
+  const { setAllChats, setChat } = useContext(ChatContext);
+
   const handlePicChange = (e) => {
     const file = e.target.files[0];
     const fileUrl = file ? URL.createObjectURL(file) : "";
     setGroupPic(fileUrl);
+  };
+
+  const handleSaveGroup = async () => {
+    console.log("group :>> ", group);
+    console.log("groupMemberIds :>> ", groupMemberIds);
+    if (!group.chatName) {
+      toastify({
+        open: true,
+        type: "error",
+        message: "Please provide the Group Name.",
+      });
+      return;
+    }
+
+    if (groupMemberIds.length < 2) {
+      toastify({
+        open: true,
+        type: "error",
+        message: "Please add atleast two users",
+      });
+      return;
+    }
+
+    const groupResponse = await AxiosClient.post(
+      `/api/chats/group/${createMode ? "" : group._id}`,
+      {
+        chatName: group.chatName,
+        users: groupMemberIds,
+      }
+    )
+      .then((res) => res.data)
+      .catch((err) => console.log("err :>> ", err));
+
+    if (groupResponse) {
+      toastify({
+        open: true,
+        type: "success",
+        message: `Group ${createMode ? "created" : "updated"} successfully.`,
+      });
+      setFetchAgain(!fetchAgain);
+      setChat(groupResponse);
+    } else {
+      toastify({
+        open: true,
+        type: "error",
+        message: "Unable to create group.",
+      });
+    }
+    onClose();
+  };
+
+  const handleAddUser = (user) => {
+    setGroup((prev) => ({
+      ...prev,
+      users: [...prev.users, user],
+    }));
+    setGroupMemberIds((prev) => [...prev, user._id]);
+    setSearchUsers("");
+    setSearchUsersResult([]);
+  };
+
+  const handleRemoveUser = (user) => {
+    setGroup((prev) => ({
+      ...prev,
+      users: prev.users.filter((u) => u._id !== user._id),
+    }));
+    setGroupMemberIds((prev) => prev.filter((id) => id !== user._id));
   };
 
   const fetchUsers = async (value) => {
@@ -96,10 +174,13 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
 
   useEffect(() => {
     setEditMode(createMode);
-    setGroupName(groupData?.chatName || "");
-    setGroupMembers(groupData?.users || []);
-    setGroupMemberIds(groupData?.users?.map((user) => user._id) || []);
-    console.log("groupData :>> ", groupData);
+    if (createMode) {
+      setGroup({ chatName: "", users: [] });
+      setGroupMemberIds([]);
+    } else {
+      setGroup(groupData);
+      setGroupMemberIds(groupData?.users?.map((user) => user._id) || []);
+    }
   }, [open]);
 
   return (
@@ -125,7 +206,7 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
             alignItems={"center"}
           >
             <Typography id="transition-modal-title" variant="h6" component="h2">
-              {createMode ? "Create new Group" : groupName}
+              {createMode ? "Create new Group" : group?.chatName}
             </Typography>
             <IconButton onClick={onClose}>
               <Clear />
@@ -173,15 +254,17 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
             </Button>
             <Box flexGrow={1} display={"flex"} alignItems={"center"}>
               {!editMode ? (
-                <Typography flexGrow={1}>{groupName}</Typography>
+                <Typography flexGrow={1}>{group?.chatName}</Typography>
               ) : (
                 <TextField
                   name="group-name"
                   label="Group Name"
                   size="small"
                   sx={{ flexGrow: 1 }}
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
+                  value={group?.chatName}
+                  onChange={(e) =>
+                    setGroup({ ...group, chatName: e.target.value })
+                  }
                 />
               )}
               <IconButton onClick={() => setEditMode(!editMode)}>
@@ -256,6 +339,7 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
                             ),
                           },
                         })}
+                        onClick={() => handleAddUser(user)}
                       >
                         <Avatar src={user.pic} />
                         <Box flexGrow={1}>
@@ -282,18 +366,18 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
           </Box>
           <Box pb={1}>
             <Typography pb={1} fontWeight={600}>
-              MEMBERS({groupMembers.length})
+              MEMBERS({groupMemberIds.length})
             </Typography>
             <Stack sx={{ overflow: "auto" }}>
-              {groupMembers.length ? (
-                groupMembers.map((member) => (
+              {groupMemberIds.length ? (
+                group?.users?.map((member) => (
                   <Box p={0.5} display={"flex"} gap={1} alignItems={"center"}>
                     <Avatar src={member?.pic} />
                     <Typography flexGrow={1}>{member?.name}</Typography>
-                    {member?._id === groupData?.groupAdmin?._id ? (
+                    {member?._id === group?.groupAdmin?._id ? (
                       <Chip label="Admin" />
                     ) : (
-                      <IconButton>
+                      <IconButton onClick={() => handleRemoveUser(member)}>
                         <Clear fontSize="small" />
                       </IconButton>
                     )}
@@ -320,6 +404,7 @@ const GroupModal = ({ groupData, open, createMode, onClose }) => {
               variant="contained"
               disableElevation
               sx={{ borderRadius: 2, ml: 1 }}
+              onClick={handleSaveGroup}
             >
               Save
             </Button>

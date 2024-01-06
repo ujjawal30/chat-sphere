@@ -10,8 +10,8 @@ const UserProvider = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    const { user } = JSON.parse(localStorage.getItem("user"));
-    setUser(user);
+    const userInfo = JSON.parse(localStorage.getItem("user"));
+    setUser(userInfo?.user || {});
     console.log("user :>> ", user);
 
     // if (!userInfo) {
