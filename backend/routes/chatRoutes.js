@@ -2,10 +2,6 @@ const { Router } = require("express");
 const {
   getChats,
   getAllChats,
-  createGroup,
-  renameGroup,
-  addToGroup,
-  removeFromGroup,
   createOrUpdateGroup,
 } = require("../controllers/chatContollers");
 const { protectedRoute } = require("../middlewares/authMiddleware");
