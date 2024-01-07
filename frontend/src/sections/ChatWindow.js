@@ -67,7 +67,7 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
   }, [messages]);
 
   return (
-    <Box bgcolor={"white"} height="100%" borderRadius={5}>
+    <Box bgcolor={"white"} height="100%" borderRadius={3}>
       {chat ? (
         <Box
           display={"flex"}
@@ -93,7 +93,9 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
             </IconButton>
             <Avatar src={chat?.pic} sx={{ width: 48, height: 48 }} />
             <Stack flexGrow={1}>
-              <Typography variant="h4">{chat?.chatName || "Test"}</Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {chat?.chatName || "Test"}
+              </Typography>
             </Stack>
             <IconButton
               onClick={

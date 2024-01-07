@@ -39,7 +39,7 @@ const Navbar = ({ onGroupModalOpen, onProfileModalOpen }) => {
       <AppBar
         position="static"
         sx={{
-          borderRadius: 5,
+          borderRadius: 3,
           height: "56px",
           justifyContent: "center",
           boxShadow: "none",

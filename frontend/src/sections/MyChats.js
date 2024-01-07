@@ -25,14 +25,8 @@ const MyChats = ({ fetchAgain }) => {
   }, [fetchAgain]);
 
   return (
-    <Box overflow={"hidden"} borderRadius={5} height="100%">
-      <Box
-        bgcolor={"white"}
-        borderRadius={5}
-        p={{ xs: 1, sm: 2 }}
-        height="100%"
-        sx={{ overflowY: "auto" }}
-      >
+    <Box overflow={"hidden"} borderRadius={3} height="100%">
+      <Box bgcolor={"white"} p={1} height="100%" sx={{ overflowY: "auto" }}>
         {isLoading ? (
           <Box
             display={"flex"}

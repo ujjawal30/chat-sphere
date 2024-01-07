@@ -40,9 +40,9 @@ const ProfileMenu = ({
       transformOrigin={{ horizontal: "right", vertical: "top" }}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <MenuItem sx={{ lineHeight: 0 }}>
+      <MenuItem disableRipple sx={{ lineHeight: 0 }}>
         <ListItemIcon>
-          <Avatar src={user?.pic} sx={{ width: 48, height: 48 }} />
+          <Avatar src={user?.pic} sx={{ width: 64, height: 64 }} />
         </ListItemIcon>
         <Box px={1}>
           <Typography>{user?.name}</Typography>
