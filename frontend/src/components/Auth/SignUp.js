@@ -41,7 +41,7 @@ const SignUp = () => {
       });
 
       localStorage.setItem("user", JSON.stringify(registerUserResponse));
-      navigate("/chats");
+      navigate("/");
     } else {
       toastify({
         open: true,

@@ -11,6 +11,7 @@ import {
 import { red } from "@mui/material/colors";
 import { ChatContext } from "../context/ChatProvider";
 import { UserContext } from "../context/UserProvider";
+import { getSender } from "../helpers/ChatHelpers";
 
 const ChatCard = ({ data }) => {
   const { chat, setChat } = useContext(ChatContext);
@@ -56,7 +57,10 @@ const ChatCard = ({ data }) => {
         alignItems="center"
         gap={1}
       >
-        <Avatar src={data?.pic} sx={{ width: 48, height: 48 }} />
+        <Avatar
+          src={data?.isGroupChat ? "" : getSender(data?.users, user).pic}
+          sx={{ width: 48, height: 48 }}
+        />
         <Stack flexGrow={1} width={"50%"}>
           <Typography
             variant="subtitle2"
@@ -67,7 +71,7 @@ const ChatCard = ({ data }) => {
           >
             {data?.isGroupChat
               ? data?.chatName
-              : data?.users?.find((u) => u._id !== user?._id)?.name}
+              : getSender(data?.users, user).name}
           </Typography>
           <Typography
             variant="caption"
@@ -75,9 +79,11 @@ const ChatCard = ({ data }) => {
             textOverflow={"ellipsis"}
             whiteSpace={"nowrap"}
           >
-            {data?.isGroupChat
-              ? "chat created"
-              : data?.users?.find((u) => u._id !== user?._id)?.email}
+            {data?.latestMessage
+              ? data?.latestMessage?.sender?._id === user._id
+                ? `You: ${data?.latestMessage?.content}`
+                : `${data?.latestMessage?.sender?.name}: ${data?.latestMessage?.content}`
+              : ""}
           </Typography>
         </Stack>
         <Stack alignSelf={"start"} pt={1}>

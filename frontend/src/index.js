@@ -6,18 +6,27 @@ import App from "./App";
 import UserProvider from "./context/UserProvider";
 import ToastProvider from "./context/ToastProvider";
 import ChatProvider from "./context/ChatProvider";
+import { ThemeProvider, createTheme } from "@mui/material";
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "Poppins",
+  },
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ToastProvider>
-        <UserProvider>
-          <ChatProvider>
-            <App />
-          </ChatProvider>
-        </UserProvider>
-      </ToastProvider>
+      <ThemeProvider theme={theme}>
+        <ToastProvider>
+          <UserProvider>
+            <ChatProvider>
+              <App />
+            </ChatProvider>
+          </UserProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

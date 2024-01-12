@@ -76,6 +76,8 @@ const ChatPage = () => {
             sx={{ position: "relative", height: "100%" }}
           >
             <ChatWindow
+              fetchAgain={fetchAgain}
+              setFetchAgain={setFetchAgain}
               openGroupModal={openGroupModal}
               openProfileModal={openProfileModal}
             />

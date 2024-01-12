@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import React, { useContext } from "react";
 import { UserContext } from "../context/UserProvider";
+import { useNavigate } from "react-router-dom";
 
 const ProfileMenu = ({
   anchorEl,
@@ -26,8 +27,14 @@ const ProfileMenu = ({
   onProfileModalOpen,
 }) => {
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const isMenuOpen = Boolean(anchorEl);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/auth");
+  };
 
   return (
     <Menu
@@ -74,7 +81,7 @@ const ProfileMenu = ({
         </ListItemIcon>
         Settings
       </MenuItem>
-      <MenuItem onClick={handleClose}>
+      <MenuItem onClick={handleLogout}>
         <ListItemIcon>
           <Logout fontSize="small" />
         </ListItemIcon>

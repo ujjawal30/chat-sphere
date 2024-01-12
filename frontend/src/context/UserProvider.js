@@ -14,11 +14,11 @@ const UserProvider = ({ children }) => {
     setUser(userInfo?.user || {});
     console.log("user :>> ", user);
 
-    // if (!userInfo) {
-    //   navigate("/");
-    // } else {
-    //   navigate("/chats");
-    // }
+    if (!userInfo) {
+      navigate("/auth");
+    } else {
+      navigate("/");
+    }
   }, [location.pathname]);
 
   return (

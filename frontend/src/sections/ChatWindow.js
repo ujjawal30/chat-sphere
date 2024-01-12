@@ -3,6 +3,8 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
+  FormControl,
   IconButton,
   Paper,
   Stack,
@@ -12,6 +14,9 @@ import {
 } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../context/ChatProvider";
+import AxiosClient from "../api/AxiosClient";
+import { getSender } from "../helpers/ChatHelpers";
+import { UserContext } from "../context/UserProvider";
 
 const MSG = [
   {
@@ -44,31 +49,76 @@ const MSG = [
   },
 ];
 
-const ChatWindow = ({ openGroupModal, openProfileModal }) => {
-  const [messages, setMessages] = useState(MSG);
+const ChatWindow = ({
+  fetchAgain,
+  setFetchAgain,
+  openGroupModal,
+  openProfileModal,
+}) => {
+  const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
 
   const { chat, setChat } = useContext(ChatContext);
+  const { user } = useContext(UserContext);
 
-  const handleSendMessage = () => {
-    setMessages([...messages, { content: newMsg, sent: true }]);
-    setNewMsg("");
+  const fetchAllMessages = async () => {
+    if (!chat) return;
+
+    setIsLoading(true);
+    const allMessages = await AxiosClient.get(`api/messages/${chat._id}`)
+      .then((response) => response.data)
+      .catch((error) => console.log(error.message));
+
+    setMessages(allMessages);
+    setIsLoading(false);
+  };
+
+  const handleSendMessage = async (event) => {
+    event.preventDefault();
+
+    if (newMsg) {
+      const messageResponse = await AxiosClient.post("/api/messages", {
+        chatId: chat._id,
+        content: newMsg,
+      })
+        .then((response) => response.data)
+        .catch((error) => console.log("error :>> ", error));
+
+      setFetchAgain(!fetchAgain);
+      setMessages([...messages, messageResponse]);
+      scrollToBottom();
+      setNewMsg("");
+    }
   };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView(true);
   };
 
+  const isSent = () => {
+    return getSender(chat?.users, user)._id === user._id;
+  };
+
   useEffect(() => {
-    scrollToBottom();
-    console.log("new message send", messages);
-  }, [messages]);
+    fetchAllMessages();
+    console.log("chat :>> ", chat);
+  }, [chat]);
 
   return (
     <Box bgcolor={"white"} height="100%" borderRadius={3}>
-      {chat ? (
+      {isLoading ? (
+        <Box
+          height="100%"
+          display={"flex"}
+          justifyContent={"center"}
+          alignItems={"center"}
+        >
+          <CircularProgress />
+        </Box>
+      ) : chat ? (
         <Box
           display={"flex"}
           flexDirection={"column"}
@@ -91,10 +141,15 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
             >
               <ArrowBack />
             </IconButton>
-            <Avatar src={chat?.pic} sx={{ width: 48, height: 48 }} />
+            <Avatar
+              src={chat?.isGroupChat ? "" : getSender(chat?.users, user).pic}
+              sx={{ width: 48, height: 48 }}
+            />
             <Stack flexGrow={1}>
               <Typography variant="h6" fontWeight={600}>
-                {chat?.chatName || "Test"}
+                {chat?.isGroupChat
+                  ? chat?.chatName
+                  : getSender(chat?.users, user).name}
               </Typography>
             </Stack>
             <IconButton
@@ -128,12 +183,14 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
             >
               {messages.map((msg) => (
                 <Paper
+                  key={msg._id}
                   elevation={0}
                   sx={{
                     p: 1,
-                    alignSelf: msg.sent ? "end" : "start",
-                    backgroundColor: msg.sent ? "#1976d2" : "#cccccc",
-                    color: msg.sent ? "white" : "auto",
+                    alignSelf: msg?.sender?._id === user._id ? "end" : "start",
+                    backgroundColor:
+                      msg?.sender?._id === user._id ? "#1976d2" : "#cccccc",
+                    color: msg?.sender?._id === user._id ? "white" : "auto",
                     maxWidth: "80%",
                     width: "fit-content",
                     overflowWrap: "anywhere",
@@ -146,8 +203,9 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
               <Box ref={messagesEndRef}></Box>
             </Box>
           </Box>
-          <Box display={"flex"} gap={1}>
+          <Box component="form" display={"flex"} gap={1}>
             <TextField
+              required
               id="message"
               placeholder="Type your message..."
               fullWidth
@@ -156,6 +214,7 @@ const ChatWindow = ({ openGroupModal, openProfileModal }) => {
               sx={{ "& .MuiInputBase-root": { borderRadius: 4 } }}
             />
             <Button
+              type="submit"
               variant="contained"
               edge="end"
               sx={{ borderRadius: 4 }}
