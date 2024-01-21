@@ -8,9 +8,11 @@ const MyChats = ({ fetchAgain }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { allChats, setAllChats } = useContext(ChatContext);
+  const client = AxiosClient();
 
   const fetchAllChats = async () => {
-    const chatsResponse = await AxiosClient.get(`/api/chats`)
+    const chatsResponse = await client
+      .get(`/api/chats`)
       .then((res) => res.data)
       .catch((err) => console.log("err :>> ", err));
 

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -10,8 +9,8 @@ import {
   Stack,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import AxiosClient from "../../api/AxiosClient";
 import { ToastContext } from "../../context/ToastProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -20,36 +19,8 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
   const { toastify } = useContext(ToastContext);
-
-  const fetchData = async () => {
-    const registerUserResponse = await AxiosClient.post("/api/user/register", {
-      name,
-      email,
-      password,
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log("err :>> ", err));
-
-    console.log("registerUserResponse :>> ", registerUserResponse);
-    if (registerUserResponse) {
-      toastify({
-        open: true,
-        type: "success",
-        message: "User registered successfully",
-      });
-
-      localStorage.setItem("user", JSON.stringify(registerUserResponse));
-      navigate("/");
-    } else {
-      toastify({
-        open: true,
-        type: "error",
-        message: "Something wnet wrong!!!",
-      });
-    }
-  };
+  const { register } = useAuth();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -72,7 +43,7 @@ const SignUp = () => {
       return;
     }
 
-    fetchData();
+    register({ email, name, password });
   };
 
   return (

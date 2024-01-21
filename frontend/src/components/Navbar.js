@@ -26,7 +26,6 @@ const Navbar = ({ onGroupModalOpen, onProfileModalOpen }) => {
   };
 
   const handleMenuOpen = (event) => {
-    console.log("event :>> ", event.currentTarget);
     setMenuAnchorEl(event.currentTarget);
   };
 

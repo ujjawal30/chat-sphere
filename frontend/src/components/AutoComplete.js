@@ -13,9 +13,11 @@ import AxiosClient from "../api/AxiosClient";
 
 const AutoComplete = ({ resultSet, loading, onClose }) => {
   const { allChats, setChat, setAllChats } = useContext(ChatContext);
+  const client = AxiosClient();
 
   const handleSearchItemClick = async (user) => {
-    const chatResponse = await AxiosClient.get(`/api/chats/${user._id}`)
+    const chatResponse = await client
+      .get(`/api/chats/${user._id}`)
       .then((res) => res.data)
       .catch((err) => console.log("err :>> ", err));
 

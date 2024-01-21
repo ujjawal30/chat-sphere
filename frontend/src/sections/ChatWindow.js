@@ -63,12 +63,14 @@ const ChatWindow = ({
 
   const { chat, setChat } = useContext(ChatContext);
   const { user } = useContext(UserContext);
+  const client = AxiosClient();
 
   const fetchAllMessages = async () => {
     if (!chat) return;
 
     setIsLoading(true);
-    const allMessages = await AxiosClient.get(`api/messages/${chat._id}`)
+    const allMessages = await client
+      .get(`api/messages/${chat._id}`)
       .then((response) => response.data)
       .catch((error) => console.log(error.message));
 
@@ -80,10 +82,11 @@ const ChatWindow = ({
     event.preventDefault();
 
     if (newMsg) {
-      const messageResponse = await AxiosClient.post("/api/messages", {
-        chatId: chat._id,
-        content: newMsg,
-      })
+      const messageResponse = await client
+        .post("/api/messages", {
+          chatId: chat._id,
+          content: newMsg,
+        })
         .then((response) => response.data)
         .catch((error) => console.log("error :>> ", error));
 

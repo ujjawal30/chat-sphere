@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -11,6 +11,8 @@ import {
 import axios from "axios";
 import SignUp from "../components/Auth/SignUp";
 import SignIn from "../components/Auth/SignIn";
+import { Navigate } from "react-router-dom";
+import { UserContext } from "../context/UserProvider";
 
 const StyledTabs = styled((props) => <Tabs {...props} />)({
   "& .MuiTabs-indicator": {
@@ -36,6 +38,8 @@ const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
 const Homepage = () => {
   const [value, setValue] = useState(0);
 
+  const { user } = useContext(UserContext);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -45,9 +49,9 @@ const Homepage = () => {
     console.log("data :>> ", data);
   };
 
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+  if (user) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <Container

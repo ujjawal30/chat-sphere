@@ -8,6 +8,7 @@ import ProfileModal from "../components/modals/ProfileModal";
 import { getSender } from "../helpers/ChatHelpers";
 import MyChats from "../sections/MyChats";
 import ChatWindow from "../sections/ChatWindow";
+import { Navigate } from "react-router-dom";
 
 const defaultGroupModalOptions = {
   open: false,
@@ -50,6 +51,10 @@ const ChatPage = () => {
 
   const closeProfileModal = () =>
     setProfileModalOptions({ ...profileModalOptions, open: false });
+
+  if (!user) {
+    return <Navigate to="/auth" />;
+  }
 
   return (
     <Container maxWidth="xl" sx={{ p: { xs: 1 }, height: "100vh" }}>

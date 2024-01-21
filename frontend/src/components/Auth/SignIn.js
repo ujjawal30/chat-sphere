@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -10,44 +9,16 @@ import {
   Stack,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import AxiosClient from "../../api/AxiosClient";
 import { ToastContext } from "../../context/ToastProvider";
+import { useAuth } from "../../hooks/useAuth";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
   const { toastify } = useContext(ToastContext);
-
-  const authnticateUser = async () => {
-    const userResponse = await AxiosClient.post("/api/user/auth", {
-      email,
-      password,
-    })
-      .then((res) => res.data)
-      .catch((err) => console.log("err :>> ", err));
-
-    console.log("userResponse :>> ", userResponse);
-    if (userResponse) {
-      toastify({
-        open: true,
-        type: "success",
-        message: "User logged-in successfully",
-      });
-      // toastify("Logged in");
-
-      localStorage.setItem("user", JSON.stringify(userResponse));
-      navigate("/chats");
-    } else {
-      toastify({
-        open: true,
-        type: "error",
-        message: "Something wnet wrong!!!",
-      });
-    }
-  };
+  const { login } = useAuth();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -61,7 +32,7 @@ const SignIn = () => {
       return;
     }
 
-    authnticateUser();
+    login({ email, password });
   };
 
   return (

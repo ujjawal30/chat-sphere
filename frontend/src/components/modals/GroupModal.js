@@ -77,6 +77,7 @@ const GroupModal = ({
 
   const { toastify } = useContext(ToastContext);
   const { setAllChats, setChat } = useContext(ChatContext);
+  const client = AxiosClient();
 
   const handlePicChange = (e) => {
     const file = e.target.files[0];
@@ -105,13 +106,11 @@ const GroupModal = ({
       return;
     }
 
-    const groupResponse = await AxiosClient.post(
-      `/api/chats/group/${createMode ? "" : group._id}`,
-      {
+    const groupResponse = await client
+      .post(`/api/chats/group/${createMode ? "" : group._id}`, {
         chatName: group.chatName,
         users: groupMemberIds,
-      }
-    )
+      })
       .then((res) => res.data)
       .catch((err) => console.log("err :>> ", err));
 
@@ -152,7 +151,8 @@ const GroupModal = ({
   };
 
   const fetchUsers = async (value) => {
-    const usersResponse = await AxiosClient.get(`/api/user?search=${value}`)
+    const usersResponse = await client
+      .get(`/api/user?search=${value}`)
       .then((res) => res.data)
       .catch((err) => console.log("err :>> ", err));
 

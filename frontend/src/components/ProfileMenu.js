@@ -19,6 +19,7 @@ import {
 import React, { useContext } from "react";
 import { UserContext } from "../context/UserProvider";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const ProfileMenu = ({
   anchorEl,
@@ -28,6 +29,7 @@ const ProfileMenu = ({
 }) => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -81,7 +83,7 @@ const ProfileMenu = ({
         </ListItemIcon>
         Settings
       </MenuItem>
-      <MenuItem onClick={handleLogout}>
+      <MenuItem onClick={logout}>
         <ListItemIcon>
           <Logout fontSize="small" />
         </ListItemIcon>

@@ -16,10 +16,12 @@ const SearchBar = ({ active, onClose }) => {
   const [searchResult, setSearchResult] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
+  const client = AxiosClient();
   const searchRef = useRef(null);
 
   const fetchUsers = async (value) => {
-    const usersResponse = await AxiosClient.get(`/api/user?search=${value}`)
+    const usersResponse = await client
+      .get(`/api/user?search=${value}`)
       .then((res) => res.data)
       .catch((err) => console.log("err :>> ", err));
 
