@@ -18,37 +18,6 @@ import AxiosClient from "../api/AxiosClient";
 import { getSender } from "../helpers/ChatHelpers";
 import { UserContext } from "../context/UserProvider";
 
-const MSG = [
-  {
-    content: "Hi",
-    sent: false,
-  },
-  {
-    content: "How r u",
-    sent: false,
-  },
-  {
-    content: "I m fine",
-    sent: true,
-  },
-  {
-    content: "Gm",
-    sent: false,
-  },
-  {
-    content: "Have a nice day",
-    sent: false,
-  },
-  {
-    content: "GN",
-    sent: true,
-  },
-  {
-    content: "SDTC",
-    sent: true,
-  },
-];
-
 const ChatWindow = ({
   fetchAgain,
   setFetchAgain,
@@ -73,6 +42,8 @@ const ChatWindow = ({
       .get(`api/messages/${chat._id}`)
       .then((response) => response.data)
       .catch((error) => console.log(error.message));
+
+    console.log("allMessages :>> ", allMessages);
 
     setMessages(allMessages);
     setIsLoading(false);
@@ -184,24 +155,42 @@ const ChatWindow = ({
               sx={{ overflowY: "auto" }}
               p={1}
             >
-              {messages.map((msg) => (
-                <Paper
-                  key={msg._id}
-                  elevation={0}
-                  sx={{
-                    p: 1,
-                    alignSelf: msg?.sender?._id === user._id ? "end" : "start",
-                    backgroundColor:
-                      msg?.sender?._id === user._id ? "#1976d2" : "#cccccc",
-                    color: msg?.sender?._id === user._id ? "white" : "auto",
-                    maxWidth: "80%",
-                    width: "fit-content",
-                    overflowWrap: "anywhere",
-                    borderRadius: 2,
-                  }}
+              {messages.map((msg, index) => (
+                <Box
+                  alignSelf={msg?.sender?._id === user._id ? "end" : "start"}
+                  maxWidth="80%"
+                  width="fit-content"
                 >
-                  {msg.content}
-                </Paper>
+                  <Typography
+                    display={
+                      msg?.sender?._id === user._id ||
+                      messages[index - 1]?.sender?._id === msg?.sender?._id
+                        ? "none"
+                        : "block"
+                    }
+                    variant="subtitle2"
+                    color={"GrayText"}
+                  >
+                    {msg.sender.name}
+                  </Typography>
+                  <Paper
+                    key={msg._id}
+                    elevation={0}
+                    sx={{
+                      p: 1,
+                      alignSelf:
+                        msg?.sender?._id === user._id ? "end" : "start",
+                      backgroundColor:
+                        msg?.sender?._id === user._id ? "#1976d2" : "#cccccc",
+                      color: msg?.sender?._id === user._id ? "white" : "auto",
+                      width: "fit-content",
+                      overflowWrap: "anywhere",
+                      borderRadius: 2,
+                    }}
+                  >
+                    {msg.content}
+                  </Paper>
+                </Box>
               ))}
               <Box ref={messagesEndRef}></Box>
             </Box>
