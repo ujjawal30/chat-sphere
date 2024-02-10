@@ -10,6 +10,7 @@ const {
   notFoundMiddleware,
   errorMiddleware,
 } = require("./middlewares/errorMiddleware");
+const { Server } = require("socket.io");
 
 dotenv.config({ path: "./.env.local" });
 connectDB();
@@ -29,7 +30,29 @@ app.use("/api/messages", messageRoutes);
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-app.listen(
+const server = app.listen(
   PORT,
   console.log(`Server is listening at PORT ${PORT}`.yellow.underline.bold)
 );
+
+const io = new Server(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("<<: Socket Connected :>>".bgYellow.black);
+
+  socket.on("setup", (user) => {
+    socket.join(user._id);
+    console.log("user connected :>> ", user);
+    socket.emit("connected");
+  });
+
+  socket.on("join", (user) => {
+    socket.join(user._id);
+    console.log("newUser :>> ", user);
+  });
+});
