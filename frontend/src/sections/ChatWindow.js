@@ -13,10 +13,14 @@ import {
   alpha,
 } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
 import { ChatContext } from "../context/ChatProvider";
 import AxiosClient from "../api/AxiosClient";
 import { getSender } from "../helpers/ChatHelpers";
 import { UserContext } from "../context/UserProvider";
+import Messages from "../components/Messages";
+
+let socket;
 
 const ChatWindow = ({
   fetchAgain,
@@ -27,8 +31,8 @@ const ChatWindow = ({
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const messagesEndRef = useRef(null);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(true);
 
   const { chat, setChat } = useContext(ChatContext);
   const { user } = useContext(UserContext);
@@ -47,6 +51,8 @@ const ChatWindow = ({
 
     setMessages(allMessages);
     setIsLoading(false);
+
+    socket.emit("join", chat);
   };
 
   const handleSendMessage = async (event) => {
@@ -63,18 +69,19 @@ const ChatWindow = ({
 
       setFetchAgain(!fetchAgain);
       setMessages([...messages, messageResponse]);
-      scrollToBottom();
       setNewMsg("");
     }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView(true);
   };
 
   const isSent = () => {
     return getSender(chat?.users, user)._id === user._id;
   };
+
+  useEffect(() => {
+    socket = io("http://localhost:5000");
+    socket.emit("setup", user);
+    socket.on("connected", () => setIsSocketConnected(true));
+  }, []);
 
   useEffect(() => {
     fetchAllMessages();
@@ -148,52 +155,7 @@ const ChatWindow = ({
               backgroundColor: alpha(theme.palette.primary.main, 0.15),
             })}
           >
-            <Box
-              display="flex"
-              flexDirection="column"
-              gap="2px"
-              sx={{ overflowY: "auto" }}
-              p={1}
-            >
-              {messages.map((msg, index) => (
-                <Box
-                  alignSelf={msg?.sender?._id === user._id ? "end" : "start"}
-                  maxWidth="80%"
-                  width="fit-content"
-                >
-                  <Typography
-                    display={
-                      msg?.sender?._id === user._id ||
-                      messages[index - 1]?.sender?._id === msg?.sender?._id
-                        ? "none"
-                        : "block"
-                    }
-                    variant="subtitle2"
-                    color={"GrayText"}
-                  >
-                    {msg.sender.name}
-                  </Typography>
-                  <Paper
-                    key={msg._id}
-                    elevation={0}
-                    sx={{
-                      p: 1,
-                      alignSelf:
-                        msg?.sender?._id === user._id ? "end" : "start",
-                      backgroundColor:
-                        msg?.sender?._id === user._id ? "#1976d2" : "#cccccc",
-                      color: msg?.sender?._id === user._id ? "white" : "auto",
-                      width: "fit-content",
-                      overflowWrap: "anywhere",
-                      borderRadius: 2,
-                    }}
-                  >
-                    {msg.content}
-                  </Paper>
-                </Box>
-              ))}
-              <Box ref={messagesEndRef}></Box>
-            </Box>
+            <Messages messages={messages} isTyping={isTyping} />
           </Box>
           <Box component="form" display={"flex"} gap={1}>
             <TextField

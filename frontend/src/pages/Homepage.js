@@ -9,8 +9,8 @@ import {
   styled,
 } from "@mui/material";
 import axios from "axios";
-import SignUp from "../components/Auth/SignUp";
-import SignIn from "../components/Auth/SignIn";
+import SignUp from "../components/auth/SignUp";
+import SignIn from "../components/auth/SignIn";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserProvider";
 
