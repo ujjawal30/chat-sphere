@@ -52,7 +52,7 @@ const ChatWindow = ({
     setMessages(allMessages);
     setIsLoading(false);
 
-    socket.emit("join", chat);
+    socket.emit("join", chat._id);
   };
 
   const handleSendMessage = async (event) => {
@@ -70,6 +70,8 @@ const ChatWindow = ({
       setFetchAgain(!fetchAgain);
       setMessages([...messages, messageResponse]);
       setNewMsg("");
+
+      socket.emit("message-sent", messageResponse);
     }
   };
 
@@ -79,9 +81,18 @@ const ChatWindow = ({
 
   useEffect(() => {
     socket = io("http://localhost:5000");
-    socket.emit("setup", user);
+    socket.emit("setup", user._id);
     socket.on("connected", () => setIsSocketConnected(true));
   }, []);
+
+  useEffect(() => {
+    socket.on("message-recieved", (message) => {
+      if (chat && chat._id === message.chat._id) {
+        setMessages([...messages, message]);
+        setFetchAgain(!fetchAgain);
+      }
+    });
+  });
 
   useEffect(() => {
     fetchAllMessages();
@@ -146,9 +157,6 @@ const ChatWindow = ({
           <Box
             flexGrow={1}
             borderRadius={2}
-            display="flex"
-            flexDirection="column"
-            justifyContent="flex-end"
             height="100%"
             overflow="hidden"
             sx={(theme) => ({

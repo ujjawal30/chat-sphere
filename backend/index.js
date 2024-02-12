@@ -46,13 +46,23 @@ io.on("connection", (socket) => {
   console.log("<<: Socket Connected :>>".bgYellow.black);
 
   socket.on("setup", (user) => {
-    socket.join(user._id);
-    console.log("user connected :>> ", user);
+    socket.join(user);
+    console.log("Room Setup :>> ", user);
     socket.emit("connected");
   });
 
-  socket.on("join", (user) => {
-    socket.join(user._id);
-    console.log("newUser :>> ", user);
+  socket.on("join", (room) => {
+    socket.join(room);
+    console.log("User Joined Room :>> ", room);
+  });
+
+  socket.on("message-sent", (message) => {
+    const chat = message.chat;
+
+    chat.users.forEach((user) => {
+      if (user._id == message.sender._id) return;
+
+      socket.in(user._id).emit("message-recieved", message);
+    });
   });
 });
