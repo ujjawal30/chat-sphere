@@ -32,7 +32,8 @@ const ChatWindow = ({
   const [newMsg, setNewMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [isTyping, setIsTyping] = useState(true);
+  const [isSenderTyping, setIsSenderTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const { chat, setChat } = useContext(ChatContext);
   const { user } = useContext(UserContext);
@@ -59,6 +60,9 @@ const ChatWindow = ({
     event.preventDefault();
 
     if (newMsg) {
+      socket.emit("stop-typing", chat._id);
+      setNewMsg("");
+
       const messageResponse = await client
         .post("/api/messages", {
           chatId: chat._id,
@@ -69,19 +73,38 @@ const ChatWindow = ({
 
       setFetchAgain(!fetchAgain);
       setMessages([...messages, messageResponse]);
-      setNewMsg("");
 
       socket.emit("message-sent", messageResponse);
     }
   };
 
-  const isSent = () => {
-    return getSender(chat?.users, user)._id === user._id;
+  const handleTyping = (event) => {
+    setNewMsg(event.target.value);
+
+    if (!isSocketConnected) return;
+
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("start-typing", chat._id);
+    }
+
+    const lastTypingTime = new Date().getTime();
+    const timer = 3000; // 3 secs
+    setTimeout(() => {
+      const currentTime = new Date().getTime();
+      const timeDiff = currentTime - lastTypingTime;
+      if (timeDiff >= timer && isTyping) {
+        socket.emit("stop-typing", chat._id);
+        setIsTyping(false);
+      }
+    }, timer);
   };
 
   useEffect(() => {
     socket = io("http://localhost:5000");
     socket.emit("setup", user._id);
+    socket.on("start-typing", () => setIsSenderTyping(true));
+    socket.on("stop-typing", () => setIsSenderTyping(false));
     socket.on("connected", () => setIsSocketConnected(true));
   }, []);
 
@@ -163,7 +186,7 @@ const ChatWindow = ({
               backgroundColor: alpha(theme.palette.primary.main, 0.15),
             })}
           >
-            <Messages messages={messages} isTyping={isTyping} />
+            <Messages messages={messages} isTyping={isSenderTyping} />
           </Box>
           <Box component="form" display={"flex"} gap={1}>
             <TextField
@@ -172,7 +195,7 @@ const ChatWindow = ({
               placeholder="Type your message..."
               fullWidth
               value={newMsg}
-              onChange={(e) => setNewMsg(e.target.value)}
+              onChange={handleTyping}
               sx={{ "& .MuiInputBase-root": { borderRadius: 4 } }}
             />
             <Button
