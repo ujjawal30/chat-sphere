@@ -12,6 +12,7 @@ import { red } from "@mui/material/colors";
 import { ChatContext } from "../context/ChatProvider";
 import { UserContext } from "../context/UserProvider";
 import { getSender } from "../helpers/ChatHelpers";
+import { getLatestMessageDate } from "../helpers/DateHelpers";
 
 const ChatCard = ({ data }) => {
   const { chat, setChat } = useContext(ChatContext);
@@ -87,7 +88,9 @@ const ChatCard = ({ data }) => {
           </Typography>
         </Stack>
         <Stack alignSelf={"start"} pt={1}>
-          <Typography variant="caption">{data?.updatedAt}</Typography>
+          <Typography variant="caption">
+            {getLatestMessageDate(data?.updatedAt)}
+          </Typography>
         </Stack>
       </Box>
     </Paper>
