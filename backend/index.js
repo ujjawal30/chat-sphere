@@ -12,7 +12,7 @@ const {
 } = require("./middlewares/errorMiddleware");
 const { Server } = require("socket.io");
 
-dotenv.config({ path: "./.env.local" });
+dotenv.config();
 connectDB();
 
 const PORT = process.env.PORT || 5000;
