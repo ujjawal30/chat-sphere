@@ -1,6 +1,6 @@
 # ChatSphere
 
-This is a basic Chat Application built on MERN.
+This is a basic Chat Application built on MERN stack with Socket.io for realtime messaging.
 
 ## Getting Started
 
