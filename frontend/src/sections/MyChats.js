@@ -3,20 +3,29 @@ import React, { useContext, useEffect, useState } from "react";
 import ChatCard from "../components/ChatCard";
 import { ChatContext } from "../context/ChatProvider";
 import AxiosClient from "../api/AxiosClient";
+import { useAuth } from "../hooks/useAuth";
 
 const MyChats = ({ fetchAgain }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { allChats, setAllChats } = useContext(ChatContext);
   const client = AxiosClient();
+  const { logout } = useAuth();
 
   const fetchAllChats = async () => {
     const chatsResponse = await client
       .get(`/api/chats`)
       .then((res) => res.data)
-      .catch((err) => console.log("err :>> ", err));
+      .catch((err) => err.response);
 
-    console.log("chatsResponse :>> ", chatsResponse);
+    if (
+      chatsResponse?.status === 401 &&
+      chatsResponse?.statusText === "Unauthorized"
+    ) {
+      logout();
+      return;
+    }
+
     setAllChats(chatsResponse);
     setIsLoading(false);
   };

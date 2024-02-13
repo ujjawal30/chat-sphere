@@ -112,8 +112,8 @@ const ChatWindow = ({
     socket.on("message-recieved", (message) => {
       if (chat && chat._id === message.chat._id) {
         setMessages([...messages, message]);
-        setFetchAgain(!fetchAgain);
       }
+      setFetchAgain(!fetchAgain);
     });
   });
 
