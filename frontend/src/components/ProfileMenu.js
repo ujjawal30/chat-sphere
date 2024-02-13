@@ -1,10 +1,8 @@
 import {
-  Group,
   GroupAdd,
   Logout,
   Notifications,
   Person,
-  PersonAdd,
   Settings,
 } from "@mui/icons-material";
 import {
@@ -18,7 +16,6 @@ import {
 } from "@mui/material";
 import React, { useContext } from "react";
 import { UserContext } from "../context/UserProvider";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 const ProfileMenu = ({
@@ -28,15 +25,9 @@ const ProfileMenu = ({
   onProfileModalOpen,
 }) => {
   const { user } = useContext(UserContext);
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
   const isMenuOpen = Boolean(anchorEl);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/auth");
-  };
 
   return (
     <Menu

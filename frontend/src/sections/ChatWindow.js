@@ -4,15 +4,13 @@ import {
   Box,
   Button,
   CircularProgress,
-  FormControl,
   IconButton,
-  Paper,
   Stack,
   TextField,
   Typography,
   alpha,
 } from "@mui/material";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 import { ChatContext } from "../context/ChatProvider";
 import AxiosClient from "../api/AxiosClient";

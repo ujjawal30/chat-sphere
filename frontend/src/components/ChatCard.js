@@ -1,14 +1,5 @@
-import React, { useContext, useState } from "react";
-import {
-  Avatar,
-  Box,
-  Chip,
-  Paper,
-  Stack,
-  Typography,
-  alpha,
-} from "@mui/material";
-import { red } from "@mui/material/colors";
+import React, { useContext } from "react";
+import { Avatar, Box, Paper, Stack, Typography, alpha } from "@mui/material";
 import { ChatContext } from "../context/ChatProvider";
 import { UserContext } from "../context/UserProvider";
 import { getSender } from "../helpers/ChatHelpers";
@@ -44,7 +35,6 @@ const ChatCard = ({ data }) => {
           content: "''",
           left: 0,
           top: 0,
-          // borderRadius: 10,
           width: "2px",
           height: "100%",
           backgroundColor: theme.palette.primary.main,

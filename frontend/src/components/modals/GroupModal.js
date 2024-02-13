@@ -22,17 +22,6 @@ import AxiosClient from "../../api/AxiosClient";
 import { ToastContext } from "../../context/ToastProvider";
 import { ChatContext } from "../../context/ChatProvider";
 
-const buttonStyle = {
-  boxShadow: 0,
-  borderRadius: 2,
-  "&:hover": {
-    boxShadow: 0,
-  },
-  "&:last-child": {
-    marginLeft: 1,
-  },
-};
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -76,7 +65,7 @@ const GroupModal = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const { toastify } = useContext(ToastContext);
-  const { setAllChats, setChat } = useContext(ChatContext);
+  const { setChat } = useContext(ChatContext);
   const client = AxiosClient();
 
   const handlePicChange = (e) => {
